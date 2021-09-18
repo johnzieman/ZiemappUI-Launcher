@@ -57,10 +57,15 @@ class ZiemapUILauncher : AppCompatActivity() {
         override fun getItemCount(): Int = activities.size
     }
 
-    private class ActivityHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    private class ActivityHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
+        View.OnClickListener {
         private val nameTextView: TextView = itemView.findViewById(R.id.textView)
         private val imageImageView: ImageView = itemView.findViewById(R.id.imageView)
         private lateinit var resolveInfo: ResolveInfo
+
+        init {
+            itemView.setOnClickListener(this)
+        }
 
         fun bindActivity(resolveInfo: ResolveInfo) {
             this.resolveInfo = resolveInfo
@@ -70,5 +75,24 @@ class ZiemapUILauncher : AppCompatActivity() {
             nameTextView.text = appName
             imageImageView.setImageDrawable(appImage)
         }
+
+        override fun onClick(v: View?) {
+            val activityInfo = resolveInfo.activityInfo
+
+            val intent = Intent(Intent.ACTION_MAIN).apply {
+                setClassName(activityInfo.applicationInfo.packageName, activityInfo.name)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+
+            val context = itemView.context
+            context.startActivity(intent)
+        }
+
+
+    }
+
+    override fun onBackPressed() {
+       moveTaskToBack(false)
+
     }
 }
